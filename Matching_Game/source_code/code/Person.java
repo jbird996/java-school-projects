@@ -4,7 +4,7 @@ import javax.swing.ImageIcon;
 import support_code.FileScanner;
 
 /**
- * @author Jason
+ * @author Jason Hatfield
  *Uses pre-defined filescanner class to read person information and store as a person in each instance.  
  *Datamodel calls this class to populate it's arraylists 
  */

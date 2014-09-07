@@ -1,14 +1,14 @@
 package code;
 
 /**
- * @author Jason
+ * @author Jason Hatfield
  *This is the main driver class of the matching game.  A new datamodel is created as well as
  *instantiating the GUI as a threaded process. 
  */
-public class Lab8 {
+public class Driver {
 
 	//Constructor which takes a string and an integer
-	public Lab8(String folder, int n) {
+	public Driver(String folder, int n) {
 		DataModel dm = new DataModel(folder, n);
 		javax.swing.SwingUtilities.invokeLater(new GraphicalUserInterface(dm));
 	}
@@ -18,10 +18,10 @@ public class Lab8 {
 	accounted for in each case.*/
 	public static void main(String[] args) {
 		if (Math.random() < 0.5) {
-			new Lab8("uta", 8);
+			new Driver("uta", 8);
 		}
 		else {
-			new Lab8("fac", 6);
+			new Driver("fac", 6);
 		}
 	}
 

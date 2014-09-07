@@ -5,7 +5,7 @@ import java.awt.event.MouseListener;
 import javax.swing.JTextArea;
 
 /**
- * @author Jason
+ * @author Jason Hatfield
  *Handles the listener that awaits a click on each description.  When clicked, it sets the currently
  *selected description and JPanel in the GUI for future checking.
  */

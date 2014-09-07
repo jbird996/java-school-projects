@@ -13,7 +13,7 @@ import javax.swing.JTextArea;
 //import javax.swing.Timer;
 
 /**
- * @author Jason
+ * @author Jason Hatfield
  *Drives the graphical component of the game.  Run as a threaded process, and implementing 
  *a MouseListener to allow checking for a match on the click of the mouse.  Utilizing the listener 
  *classes, the string representations of the image, name and description are passed back into
@@ -106,13 +106,7 @@ public class GraphicalUserInterface implements Runnable, MouseListener {
 			_descriptionFrame.add(panel);
 			
 		}
-		
-		/*int delay = 1000;
-		Timer t;
-		ActionListener taskPerformer = new TimerHandler();
-		
-		new Timer(delay, new TimerHandler()).start();*/
-		
+				
 		//main frame standard configuration
 		_mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		_mainFrame.pack();

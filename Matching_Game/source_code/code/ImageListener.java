@@ -5,7 +5,7 @@ import java.awt.event.MouseListener;
 import javax.swing.JLabel;
 
 /**
- * @author Jason
+ * @author Jason Hatfield
  *Handles click on each image, sets the currently selected image and JLabel in the GUI for future checking.
  */
 public class ImageListener implements MouseListener {

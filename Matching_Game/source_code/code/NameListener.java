@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 
 /**
- * @author Jason
+ * @author Jason Hatfield
  *Handles clicks on each name button, sets the currently selected name and button in the GUI.
  */
 public class NameListener implements ActionListener {

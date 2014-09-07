@@ -6,7 +6,7 @@ import javax.swing.ImageIcon;
 
 
 /**
- * @author Jason
+ * @author Jason Hatfield
  *The datamodel provides a series of arraylists to store each person, image, name, and description.
  *Each list except the person list is shuffled for ease of randomizing the matching board.  Get methods
  *included as well.
