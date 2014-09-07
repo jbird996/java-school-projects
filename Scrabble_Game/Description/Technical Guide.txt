@@ -1,0 +1,80 @@
+Spring 2014 – t052 Group Project Technical Guide
+
+
+Pseudo-Scrabble Game Design
+
+Design of Project:
+
+Interfaces:
+
+The iBoard and iGame interfaces were originally provided by Dr. Alphonce upon checking out the project 
+initially.  The iboard interface will be implemented by the Board class, providing a skeleton for us to 
+build the actual board upon.  This function will be identical in regards to the iGame interface and the 
+Game class respectively.   
+
+Game Class:  
+
+This class provides the general structure of the gameplay for our game.  We are implementing a state 
+machine type design to allow the game to follow a logical order and prevent access to methods that are 
+not required in the current active state.  Here we will be able to start the game, register players, 
+access the order of play (which will be assigned randomly after all players are registered and the 
+start method is called), access player scores, access the last word played by a given player, and end 
+the game.
+
+Board Class:
+
+The board class provides us the board with which to play the game.  The board is instantiated by the 
+Game class which will create a 20 x 20 array of tiles, fill the valid tile locations with “empty” tiles, 
+and randomly assign a home square with which the first player will begin the game.  The class allows 
+access to the row and column of the home square, access to the tile at a given location, and access to 
+a string representation of the board at any given time.  We have also included functionality to place 
+and retract tiles as needed before submitting a word for validation checking.
+
+Player Class:
+
+This class represents the player and is created via registration with the Game class.  Each player is 
+created with a String (the name), and will create, via composition, a tileRack that is used to hold his 
+or her associated tiles throughout the duration of the game.  We are able to track the current score as 
+ue and the last word that was played by each individual player.  There are also the necessary getter 
+and setter methods in order to properly manipulate and pass the game data (scores and last word played).  
+
+Tile Class:
+
+The Tile class will be instantiated by the TileBag class (to fill the TileBag), and the Board class 
+(to fill the empty board upon its creation).  The no-argument constructor will instantiate an “empty” 
+tile with char = ‘_’ and value int = 0.  This allows us to more-easily convert the representation of 
+the board into a string as required, and ensure that no “non-empty” tiles are overridden during a given 
+turn.  The Tile(char,int) constructor will create a “non-empty” tile with associated char and int for
+use in the TileBag.  Accessor methods are also provided to draw the char and value of each tile for 
+scoring and recording of the last played word for the player.
+	
+TileBag Class:  
+
+This class is created via Composition by the game class once the game itself is initialized.  Its 
+no-argument constructor creates an ArrayList<Tile> which will be used to store the tiles for the 
+duration of the game.  It then creates all 400 tiles (with associated char and int values), randomize
+the ArrayList, and create an iterator that will ensure each tile is taken only once from the bag 
+before it is completed.  Once empty, the iterator will return false on the hasNext() method allowing
+us to determine the state of the TileBag.
+
+TileRack Class:  
+
+The TileRack class will be instantiated by the Player class when its constructor is called 
+(composition).  The constructor will create a new ArrayList<Tile> which will be used to hold each 
+individual player’s tiles.  Once the game begins, the fillRack method will be called which will draw 
+seven tiles from the TileBag and hold them until played.  This method is designed to refill the rack 
+once the player has played some or all of them on the board.  We have also provided a getRack method 
+and a removeFromRack method to facilitate its functionality.
+
+Testing:
+
+We have provided JUnit tests to examine the functionality of all methods that we were initially 
+provided.  A great deal of time was spent verifying the individual function of each module to ensure
+they could be created and operated upon successfully.  
+
+Required Functionality Pitfalls:
+
+At this point, we feel that as a whole we are providing the expected functionality as required for 
+the current stage of the project.  Once design of the UI has commenced, we will then be able to 
+realize the true scope of the project and our ability to implement any additional functionality as 
+we see fit.

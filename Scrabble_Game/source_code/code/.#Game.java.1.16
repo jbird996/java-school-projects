@@ -1,0 +1,179 @@
+package code;
+
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
+import code.interfaces.IGame;
+
+public class Game implements IGame {
+	private ArrayList<Player> _players;
+	private TileBag 		  _tileBag;
+	private	Board			  _board;	
+	private Player			  _currentPlayer;
+	private Tile			  _currentTile;
+	private Iterator<Player>  _it;
+	private String _path;
+	private boolean _firstTurn;
+	private boolean _gameStatus;
+
+
+	
+	public Game(String path){
+		_path = path;
+		_players = new ArrayList<Player>();
+		_tileBag = new TileBag();
+		_firstTurn = true;
+		_gameStatus = true;
+
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see code.interfaces.IGame#orderOfPlay()
+	 * Returns the order of play the players are in.
+	 */
+	@Override
+	public List<Player> orderOfPlay() {
+		return _players	;
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IGame#score(code.Player)
+	 * Returns the score of a passed in player.
+	 */
+	@Override
+	public int score(Player player) {
+		return player.getScore();
+	}
+	
+	
+	
+	/**
+	 * @param s
+	 * Creates a new player with a passed in name.
+	 */
+	public void createPlayer(String s){
+		register(new Player(s));
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IGame#register(code.Player)
+	 * Registers a new player to the game 
+	 * and gives them a rack of tiles which is then filled.
+	 */
+	@Override
+	public boolean register(Player player) {
+		Player p = player;
+		p.getRack().fillRack(player, _tileBag);
+		p.getRack().setOwner(p);
+		_players.add(p);
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IGame#start()
+	 * 
+	 */
+	@Override
+	public boolean start() {
+		if (_players.size() >= 2){
+			Collections.shuffle(_players);
+			_board = new Board();
+			_it = _players.iterator();
+			_currentPlayer = _it.next();
+
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean endTurn() {
+		
+		_board.sortTiles();
+		_board.checkOrientation();
+		_board.extendWord();
+		if(_firstTurn){
+			if(_board.checkOnHome()){
+				_firstTurn = false;
+			}else{
+				System.out.println("You must place one of your tiles over the home square on the first turn, try again");
+				return false;
+			}
+		}else if(!_firstTurn){
+			if(_board.checkValidWord(0)){
+				if(_board.hasAdjacent()){
+					if(_board.checkAdjacent() >= 0){
+						int tempScore = _board.turnScore();
+						String s = _board.getWordString();
+						_currentPlayer.setScore(tempScore);
+						_currentPlayer.setLastWord(s);
+						System.out.println("Valid!  Word: "+s+" Score: "+tempScore);
+						nextPlayer();
+						//check for end of game criteria
+					}else{
+						System.out.println("One or more adjacent words are invalid, please try again");
+						return false;
+					}	
+				}else{
+					System.out.println("You must attempt a word using one or more tiles already placed on the board");
+					return false;
+				}
+			}else{
+				System.out.println("Your word is invalid, please try again");
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	
+	
+	public Player getCurrentPlayer(){
+		return _currentPlayer;
+	}
+	
+	public Board getBoard(){
+		return _board;
+	}
+
+	@Override
+	public List<SimpleImmutableEntry<String, Integer>> lastTurnWordScores() {
+		ArrayList<SimpleImmutableEntry<String,Integer>> list = new ArrayList<SimpleImmutableEntry<String,Integer>>(); 
+		for(Player p:_players){
+			String s = p.getLastWord();
+			int i = p.getLastScore();
+			SimpleImmutableEntry<String,Integer> sie = new SimpleImmutableEntry<String,Integer>(s,i);
+			list.add(sie);
+		}
+		return list;
+	}
+	
+	public TileBag getBag(){
+		return _tileBag;
+	}
+	
+	public Tile getCurrentTile(){
+		return _currentTile;
+	}
+	
+	public void setCurrentTile(Tile t){
+		_currentTile = t;
+	}
+
+	public void nextPlayer(){
+		if(_it.hasNext() == true){
+			_currentPlayer = _it.next();
+			//_board.clearTempTiles();
+		}
+		else {
+			_it = _players.iterator();
+			_currentPlayer = _players.get(0);
+		}
+	}
+}

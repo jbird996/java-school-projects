@@ -1,0 +1,483 @@
+package code;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
+
+import code.interfaces.IBoard;
+
+public class Board implements IBoard {
+	private int _homeSquareRow; //Location of the homesquare row
+	private int _homeSquareCol; //Location of the homesquare column
+	private Tile[][] _board;	//A matrix of tiles this is essentially the board
+	private Tile _homeTile;		//The home square tile
+	private ArrayList<Tile> _tempTiles;
+	private ArrayList<Tile> _word;
+	private Tile[][] _previousBoard;
+	private boolean isVertical = false;
+	private boolean isHorizontal = false;
+	private int _rLowerBound;
+	private int _rUpperBound;
+
+
+	/*
+	 * Initializes the tile matrix(aka the board) with 20 rows and 20 columns
+	 * Calls boardInit() to create the matrix with all empty tiles.
+	 * Calls homeSquareInit() to randomize the homesquare and keep it in bounds
+	 */
+	public Board(){
+		_tempTiles = new ArrayList<Tile>();
+
+		int rows = 20;
+		int col = 20;
+		_board = new Tile[rows][col];
+		_previousBoard = _board;
+		boardInit();
+		homeSquareInit();
+		this.place(_homeTile, homeSquareRow(), homeSquareCol() );
+
+	}
+	/*
+	 * Responsible for creating the home square.
+	 * The homesquare is denoted by a * on the board
+	 * The while statement checks to see if the homesquare is placed on an illegal
+	 * square and if it is, then it relocates it with another random value to ensure
+	 * it's place on a valid square at all times.
+	 * 
+	 */
+	public void homeSquareInit(){
+		Random rR = new Random();
+		Random rC = new Random();
+		_homeTile = new Tile('*',0);
+		_homeTile.setEmpty(true);
+
+		_homeSquareRow = rR.nextInt(19);
+		_homeSquareCol = rC.nextInt(19);
+
+		while ((0 <= _homeSquareRow && _homeSquareRow <= 5) && 
+				(14 <= _homeSquareCol && _homeSquareCol <= 19) || 
+				(14 <= _homeSquareRow && _homeSquareRow <= 19) && 
+				(0 <= _homeSquareCol && _homeSquareCol<= 5)){
+			_homeSquareRow = rR.nextInt(19); 
+			_homeSquareCol = rC.nextInt(19);
+		}	
+
+	}
+
+	/*
+	 * public method that returns the location of the homesquare row.
+	 */
+	@Override
+	public int homeSquareRow() {		
+		return _homeSquareRow;
+	}
+	/*
+	 * public method that returns the integer location of the homesquare column.
+	 */
+	@Override
+	public int homeSquareCol() {
+		return _homeSquareCol;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see code.interfaces.IBoard#get(int, int)
+	 * returns the tile at the row and column in the board matrix
+	 */
+	@Override
+	public Tile get(int row, int col) {
+		return _board[row][col];
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see code.interfaces.IBoard#place(code.Tile, int, int)
+	 * Method used to remove tile from current player's tilerack, which is then passed 
+	 * into the board, and added to the _tempTiles list, setting the location within the tile as well.
+	 */
+	@Override
+
+
+
+	public boolean place(Tile tile, int col, int row) {
+		if(get(col,row).checkEmpty() == true && tile != null){
+			_board[col][row] = tile;
+			_board[col][row].getTile().setLocation(col, row);
+			_tempTiles.add(_board[col][row].getTile());
+			if(tile.getValue() > 0 && tile.getOwner().getRack().getRack().size() > 0) tile.getOwner().getRack().remove(tile);
+			return true;
+
+		}			
+
+		else return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IBoard#retract(code.Tile)
+	 * Retracts a tile from the board and returns it to the player.
+	 */
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IBoard#retract(code.Tile)
+	 * Method taking in a tile that is to be removed from the board (and _tempTile arraylist)
+	 * And then added back to the current player's tilerack
+	 */
+	@Override
+	public boolean retract(Tile tile) { 
+
+		for(int i = 0; i < _tempTiles.size();i++){
+			if(_tempTiles.get(i).equals(tile)){
+
+				_board[tile.getCol()][tile.getRow()] = new Tile();
+			}
+		}
+		tile.getOwner().getRack().add(tile);
+		return true;
+
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IBoard#isEmpty(int, int)
+	 * Checks a location on the board and returns true if empty, false if the location is occupied
+	 */
+	@Override
+	public boolean isEmpty(int row, int col) {
+		if(_board[row][col].checkEmpty() == true)return true;
+
+		else return false;
+	}
+
+	/**
+	 * Method to initialize the board, places "empty" tiles in valid spaces leaving null values
+	 * in the tiles that are out of bounds.
+	 */
+	public void boardInit(){
+		Tile emptyTile = new Tile();
+		String b = "";
+		Random r = new Random();
+
+		_rLowerBound = r.nextInt(3) + 3;
+		_rUpperBound = 17 - r.nextInt(4);
+
+		for (int i = 0; i < _board.length; i++ ){
+			for (int j = 0; j < _board[0].length; j++){
+				if ( (i >= _rUpperBound) && (j <= _rLowerBound) || (i <= _rLowerBound) && (j >= _rUpperBound)){
+					b += ' ';
+				}
+				else {
+					_board[i][j] = emptyTile;
+					_board[i][j].setLocation(i, j);
+					b += _board[i][j].getChar();
+				}
+			}
+			b+= '\n';
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IBoard#boardConfiguration()
+	 * Returns string representation of the board
+	 */
+	@Override
+	public String boardConfiguration() {
+		String b = "";
+		for (int i = 0; i < _board.length; i++ ){
+			for (int j = 0; j < _board[0].length; j++){
+				if ( _board[i][j] == null){
+					b += ' ';
+				}
+				else {
+					b += _board[i][j].getChar();
+				}
+			}
+			b+= '\n';
+		}
+		return b;
+	}
+
+
+	public ArrayList<Tile> getRetractableTiles(){
+		return _tempTiles;
+	}
+	public void addRectractable(Tile t){
+		_tempTiles.add(t);
+	}
+
+
+	/**
+	 * @return ArrayList<Tile>; The tiles placed this turn
+	 */
+	public ArrayList<Tile> getTempTiles(){
+		return _tempTiles;
+
+	}
+
+
+	public Tile[][] getOldBoard(){
+		return _previousBoard;
+	}
+
+	/**
+	 * Method to clear ArrayList of tiles at the end of the turn, or if retracting all tiles
+	 */
+	public void clearTempTiles(){
+		_tempTiles.clear();
+	}
+
+
+	public ArrayList<Tile> getWord(){
+
+		return _word;
+
+	}
+
+	/**
+	 * Method to allow clearing of board
+	 */
+	public void clearBoard(){
+
+		for (int i = 0; i < _board.length; i++ ){
+			for (int j = 0; j < _board[0].length; j++){
+
+				if ( _board[i][j] == null){
+					if( _board[i][j] != _previousBoard[i][j]){
+						_word.add(_board[i][j]);
+
+						if(get(i,j)!= null && get(i,j).isRetractable() == true) {
+							_tempTiles.add(get(i,j));
+							_board[i][j] = new Tile();
+
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public void sortTiles(){
+		for (int i = 0; i < _board.length; i++ ){
+			for (int j = 0; j < _board[0].length; j++){
+				if ( (0 <= i && i <= 5) && (14 <= j && j <= 19) || (14 <= i && i <= 19) && (0 <= j && j<= 5)){
+					for(int k = 0; k < _tempTiles.size(); k++){
+						if(_board[i][j] == _tempTiles.get(k)){
+							_word.add(_tempTiles.get(k));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public void extendWord(){
+		Tile temp = _word.get(0);
+		ArrayList<Tile> tempWord = new ArrayList<Tile>();
+		if(isVertical){
+			while(temp.hasTop(this,temp.getCol(),temp.getRow())){
+				temp = _board[temp.getCol()-1][temp.getRow()];
+			}
+			while(temp.getChar() != '_'){
+				tempWord.add(temp);
+				temp = _board[temp.getCol()+1][temp.getRow()];
+			}
+			_word = tempWord;
+			isVertical = false;
+		}else if(isHorizontal){
+			while(temp.hasLeft(this,temp.getCol(),temp.getRow())){
+				temp = _board[temp.getCol()][temp.getRow()-1];
+			}
+			while(temp.getChar() != '_'){
+				tempWord.add(temp);
+				temp = _board[temp.getCol()][temp.getRow()+1];
+			}
+			_word = tempWord;
+			isHorizontal = false;
+		}
+	}
+
+	public void checkOrientation(){
+		if(_word.get(0).getCol() == _word.get(_word.size()-1).getCol()){
+			isVertical = true;
+		}else if(_word.get(0).getRow() == _word.get(_word.size()-1).getRow()){
+			isHorizontal = true;
+		}
+	}
+	
+	public String wordToString(ArrayList<Tile> list){
+		char c = ' ';
+		String s = "";
+		for(Tile t:list){
+			c = t.getChar();
+			s += c;
+		}
+		return s;
+	}
+	
+	//Needs to be tested individually, not sure if the reader reads line by line or appends to string
+	//also unsure of path to dictionary 
+	public boolean checkValidWord(){
+		
+		try(BufferedReader br = new BufferedReader(new FileReader("/projects/CSE116/words"))){
+			String line;
+			while((line = br.readLine()) != null){
+				if(wordToString(_word).equals(line)){
+					return true;
+				}
+				line = "";
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		} 		
+		return false;
+	}
+
+	public void setModifiers(){
+
+		int spaces = 0;
+
+		for (int i = 0; i < _board.length; i++ ){
+			for (int j = 0; j < _board[0].length; j++){
+				if ( _board[i][j] != null){
+					spaces++;
+				}
+
+			}
+		}
+
+		int letterTwos = spaces * (1/10);
+		int letterOnes = spaces * (8/10);
+		int letterZeros = spaces * (1/20);
+		int letterNeg = spaces * (1/20);
+
+		int wordThree = spaces * (1/20);
+		int wordTwo = spaces * (15/100);
+		int wordOne = spaces * (3/4);
+		int wordZero = spaces * (1/20);
+		
+		Random r = new Random();
+		int x = r.nextInt();
+		int y = r.nextInt();
+
+		for(int i = letterTwos; i > 0; i-- ){
+
+			
+			
+			while(_board[x][y] == null || _board[x][y].getLetterMult() != 100){
+				x = r.nextInt();
+				y = r.nextInt();
+			}
+
+			if (_board[x][y] != null || _board[x][y].getLetterMult() == 100){
+				_board[x][y].setLetterMult(2);
+			}
+
+		}
+		
+		for(int i = letterOnes; i > 0; i-- ){
+
+			
+			
+			while(_board[x][y] == null || _board[x][y].getLetterMult() != 100){
+				x = r.nextInt();
+				y = r.nextInt();
+			}
+
+			if (_board[x][y] != null || _board[x][y].getLetterMult() == 100){
+				_board[x][y].setLetterMult(1);
+			}
+
+		}
+		
+		for(int i = letterZeros; i > 0; i-- ){
+
+			
+
+			while(_board[x][y] == null || _board[x][y].getLetterMult() != 100){
+				x = r.nextInt();
+				y = r.nextInt();
+			}
+			
+			if (_board[x][y] != null || _board[x][y].getLetterMult() == 100){
+				_board[x][y].setLetterMult(0);
+			}
+
+		}
+		
+		for(int i = letterNeg; i > 0; i-- ){
+
+			
+
+			while(_board[x][y] == null || _board[x][y].getLetterMult() != 100){
+				x = r.nextInt();
+				y = r.nextInt();
+			}
+			
+			if (_board[x][y] != null || _board[x][y].getLetterMult() == 100){
+				_board[x][y].setLetterMult(-1);
+			}
+
+		}
+		
+		for(int i = wordThree; i > 0; i-- ){
+
+
+			while(_board[x][y] == null || _board[x][y].getWordMult() != 100){
+				x = r.nextInt();
+				y = r.nextInt();
+			}
+			
+			if (_board[x][y] != null || _board[x][y].getWordMult() == 100){
+				_board[x][y].setWordMult(3);
+			}
+
+		}
+		
+		for(int i = wordTwo; i > 0; i-- ){
+
+			
+
+			while(_board[x][y] == null || _board[x][y].getWordMult() != 100){
+				x = r.nextInt();
+				y = r.nextInt();
+			}
+			
+			if (_board[x][y] != null || _board[x][y].getWordMult() == 100){
+				_board[x][y].setWordMult(2);
+			}
+
+		}
+		
+		for(int i = wordOne; i > 0; i-- ){
+
+			
+
+			while(_board[x][y] == null || _board[x][y].getWordMult() != 100){
+				x = r.nextInt();
+				y = r.nextInt();
+			}
+			
+			if (_board[x][y] != null || _board[x][y].getWordMult() == 100){
+				_board[x][y].setWordMult(1);
+			}
+
+		}
+		
+		for(int i = wordZero; i > 0; i-- ){
+
+			
+
+			while(_board[x][y] == null || _board[x][y].getWordMult() != 100){
+				x = r.nextInt();
+				y = r.nextInt();
+			}
+			
+			if (_board[x][y] != null || _board[x][y].getWordMult() == 100){
+				_board[x][y].setWordMult(0);
+			}
+
+		}
+	}
+}

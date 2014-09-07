@@ -1,0 +1,36 @@
+Java User Guide:
+
+The first step to beginning play is to register all players who intend to play.
+
+To properly register you must enter your name and then hit the register button.
+
+Once all players have registered you may hit the start button to begin play.
+
+The order of play will be randomly determined when the game begins. From that point forward the 
+order will be set.
+
+When it is the player's turn they may place and retract tiles from their tilerack in order to form 
+a word.
+
+On the first turn of play the first word placed must have at least one tile placed over the homesquare, 
+which is designated on the board by a "*".
+
+After that word is placed any word may be placed o long as it connects to a previously placed word and 
+is a valid word.
+
+The validity of a word is determined by the following definitions:
+
+- Words may only be placed with their start to end flowing from either top to bottom or left to right.
+- A word will only be valid so long as it matches a word contained within the game's dictionary.
+
+When a player is satisfied with their placements or wishes to skip their turn, they may hit the 
+"end turn button" to continue onto the next player.
+
+Play may continue so long as any player possesses tiles that they may play. 
+
+If players only still possesses tiles that they cannot make a valid word with, or if they wish to end 
+the game early, they may click the "end game" button.
+
+Clicking the end game button will end play and display the endgame screen where players may view their 
+score and restart the game.
+

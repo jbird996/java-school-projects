@@ -1,0 +1,165 @@
+package code;
+
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
+import code.interfaces.IGame;
+
+public class Game implements IGame {
+	private ArrayList<Player> _players;
+	private TileBag 		  _tileBag;
+	private	Board			  _board;	
+	private Player			  _currentPlayer;
+	private Iterator<Player>  _it;
+	
+	public Game(){
+		_players = new ArrayList<Player>();
+		_tileBag = new TileBag();
+
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see code.interfaces.IGame#orderOfPlay()
+	 * Returns the order of play the players are in.
+	 */
+	@Override
+	public List<Player> orderOfPlay() {
+		return _players	;
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IGame#score(code.Player)
+	 * Returns the score of a passed in player.
+	 */
+	@Override
+	public int score(Player player) {
+		return player.getScore();
+	}
+	
+	
+	
+	/**
+	 * @param s
+	 * Creates a new player with a passed in name.
+	 */
+	public void createPlayer(String s){
+		register(new Player(s));
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IGame#register(code.Player)
+	 * Registers a new player to the game 
+	 * and gives them a rack of tiles which is then filled.
+	 */
+	@Override
+	public boolean register(Player player) {
+		Player p = player;
+		p.getRack().fillRack(player, _tileBag);
+		p.getRack().setOwner(p);
+		_players.add(p);
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see code.interfaces.IGame#start()
+	 * 
+	 */
+	@Override
+	public boolean start() {
+		if (_players.size() >= 2){
+			Collections.shuffle(_players);
+			_board = new Board();
+			_it = _players.iterator();
+			_currentPlayer = _it.next();
+
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean endTurn() {
+		
+		_board.sortTiles();
+		_board.checkOrientation();
+		_board.extendWord();
+		if(_board.checkValidWord()){
+			//scan for adjacent words & check those, if not skip valid check for adj
+			//if valid, compile score of adj and add to player score
+			//then, compile score for current word
+			//add score to player
+			//add last word to player
+			//next turn if another turn is possible(no empty tileracks, # of players consecutive skips
+			//else end game
+		}
+		return true;
+		
+	}
+	
+	public Player getCurrentPlayer(){
+		return _currentPlayer;
+	}
+	
+	public Board getBoard(){
+		return _board;
+	}
+
+	@Override
+	public List<SimpleImmutableEntry<String, Integer>> lastTurnWordScores() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public TileBag getBag(){
+		return _tileBag;
+	}
+
+
+	public Tile[][] setDimensions(Tile[][] board){
+//		String b = "";
+//
+		Random r = new Random();
+
+		int r1 = r.nextInt(3) + 3;
+		int r2 = 17 - r.nextInt(4);
+//
+//
+//		for (int x = 0; x < board.length; x++ ){
+//			for (int y = 0; y < board[0].length; y++){
+//
+//				if ( (x >= r2) && (y >= r1) || (x <= r1) && (y >= r2)){
+//	
+//				}
+//
+//				else {
+//					board[x][y] = new Tile();
+//				}
+//
+//			}
+//
+//
+//		}
+//
+//
+//
+//
+	return board;
+//
+	}
+	
+	public void nextPlayer(){
+		if(_it.hasNext() == true){
+			_currentPlayer = _it.next();
+			//_board.clearTempTiles();
+		}
+		else {
+			_it = _players.iterator();
+			_currentPlayer = _players.get(0);
+		}
+	}
+}
